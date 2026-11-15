@@ -60,7 +60,7 @@
         
         .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.6); z-index: -1; pointer-events: none; }
 
-        /* --- Левая панель (Кнопки) --- */
+        /* --- Левая панель --- */
         .left-sidebar {
             position: fixed;
             left: 40px; 
@@ -310,7 +310,6 @@
             .music-card { position: relative; transform: translateY(-20px) !important; width: 90vw; max-width: 380px; display: none; margin: 0 auto; }
             .music-card.show { display: flex; transform: translateY(0) !important; }
 
-            /* Кнопки сверху */
             .left-sidebar { 
                 top: 20px; 
                 left: 50%; 
@@ -327,7 +326,6 @@
 </head>
 <body>
 
-    <!-- Часы -->
     <div class="clock" id="clock">00:00:00</div>
 
     <div class="bg-layer" id="bg-1"></div>
@@ -335,14 +333,11 @@
     <div class="bg-layer" id="bg-3"></div>
     <div class="bg-overlay"></div>
 
-    <!-- Левая панель -->
     <div class="left-sidebar">
-        <!-- Кнопка Работы -->
         <button class="sidebar-btn" onclick="toggleWorks()">
             <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4V8h16v12z"/></svg>
             <span>Работы</span>
         </button>
-        <!-- Кнопка Друзья -->
         <button class="sidebar-btn" onclick="toggleFriends()">
             <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
             <span>Друзья</span>
@@ -351,7 +346,6 @@
 
     <div class="app-wrapper" id="app-wrapper">
         
-        <!-- Профиль -->
         <div class="profile-card" id="profile-card">
             <img src="https://i.pinimg.com/736x/39/b7/5b/39b75b89934d59c7d0d36a3a89d3a081.jpg" alt="Avatar" class="avatar" id="avatar">
             <div class="subtitle">Личная страница</div>
@@ -379,7 +373,6 @@
             </div>
         </div>
 
-        <!-- Плеер -->
         <div class="music-card" id="music-card">
             <div class="music-header">
                 <div class="album-cover"></div>
@@ -435,39 +428,23 @@
         </div>
     </div>
 
-    <!-- Модальное окно "Мои работы" -->
     <div class="modal" id="works-modal">
         <button class="close-modal" onclick="toggleWorks()">✕</button>
         <div class="soon-text" id="soon-text">СКОРО...</div>
     </div>
 
-    <!-- Модальное окно "Друзья" -->
+    <!-- Модальное окно "Друзья" (Обновлено) -->
     <div class="modal" id="friends-modal">
         <button class="close-modal" onclick="toggleFriends()">✕</button>
         <h2>Мои друзья</h2>
         <div class="friends-list">
-            <!-- Друг 1 -->
-            <a href="https://steamcommunity.com/profiles/76561198749477478/" class="friend-item" target="_blank">
-                <img src="https://i.pinimg.com/736x/39/b7/5b/39b75b89934d59c7d0d36a3a89d3a081.jpg" alt="Friend" class="friend-avatar">
+            <!-- Друг Дима -->
+            <a href="https://rwqegsdgy.github.io/phantom-site/" class="friend-item" target="_blank">
+                <!-- Аватарка, похожая на твою (аниме-девушка в наушниках/маске в тёмном стиле) -->
+                <img src="https://images.unsplash.com/photo-1618336753974-aae8e04506aa?q=80&w=200&auto=format&fit=crop" alt="Friend" class="friend-avatar">
                 <div class="friend-info">
-                    <h4>Саня</h4>
+                    <h4>Дима</h4>
                     <p>Поиграем в КС?</p>
-                </div>
-            </a>
-            <!-- Друг 2 -->
-            <a href="#" class="friend-item" target="_blank">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png" alt="Friend" class="friend-avatar">
-                <div class="friend-info">
-                    <h4>Витя</h4>
-                    <p>Гоняем на тачках</p>
-                </div>
-            </a>
-            <!-- Друг 3 -->
-            <a href="#" class="friend-item" target="_blank">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png" alt="Friend" class="friend-avatar">
-                <div class="friend-info">
-                    <h4>Леха</h4>
-                    <p>Мой напарник</p>
                 </div>
             </a>
         </div>
@@ -516,22 +493,15 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // --- ПАСХАЛКА НА АВАТАРКУ (3 клика) ---
+        // --- ПАСХАЛКА НА АВАТАРКУ ---
         let clickCount = 0;
         avatar.addEventListener('click', () => {
             clickCount++;
             avatar.classList.add('spin');
-            
-            setTimeout(() => {
-                avatar.classList.remove('spin');
-            }, 800);
-
+            setTimeout(() => { avatar.classList.remove('spin'); }, 800);
             if (clickCount === 3) {
                 avatar.classList.add('mega-spin');
-                setTimeout(() => {
-                    avatar.classList.remove('mega-spin');
-                    clickCount = 0;
-                }, 3000);
+                setTimeout(() => { avatar.classList.remove('mega-spin'); clickCount = 0; }, 3000);
             }
         });
 
@@ -542,7 +512,6 @@
         function togglePlayer() {
             musicCard.classList.toggle('show');
             appWrapper.classList.toggle('music-open');
-            
             if (musicCard.classList.contains('show')) {
                 toggleMusicBtn.textContent = 'Скрыть музыку';
                 toggleMusicBtn.classList.add('active-music');
@@ -566,7 +535,6 @@
         }
 
         function togglePlaylist() { playlist.classList.toggle('show'); }
-
         function selectTrack(title, artist) {
             document.querySelector('.track-info h3').textContent = title;
             document.querySelector('.track-info p').textContent = artist;
@@ -576,38 +544,23 @@
         // --- МОДАЛЬНЫЕ ОКНА ---
         function toggleWorks() {
             worksModal.classList.toggle('show');
-            if (worksModal.classList.contains('show')) {
-                createSparkles();
-            }
+            if (worksModal.classList.contains('show')) { createSparkles(); }
         }
-
-        function toggleFriends() {
-            friendsModal.classList.toggle('show');
-        }
+        function toggleFriends() { friendsModal.classList.toggle('show'); }
 
         function createSparkles() {
             document.querySelectorAll('.sparkle').forEach(el => el.remove());
-
             for (let i = 0; i < 20; i++) {
                 const sparkle = document.createElement('div');
                 sparkle.classList.add('sparkle');
-                
                 const size = Math.random() * 6 + 2;
                 sparkle.style.width = size + 'px';
                 sparkle.style.height = size + 'px';
-
                 const rect = soonText.getBoundingClientRect();
                 const modalRect = worksModal.getBoundingClientRect();
-                
-                const startX = rect.left - modalRect.left + Math.random() * rect.width;
-                const startY = rect.top - modalRect.top + Math.random() * rect.height;
-
-                sparkle.style.left = startX + 'px';
-                sparkle.style.top = startY + 'px';
-
-                const duration = Math.random() * 2 + 1;
-                sparkle.style.animation = `floatSparkle ${duration}s ease-in-out infinite`;
-                
+                sparkle.style.left = (rect.left - modalRect.left + Math.random() * rect.width) + 'px';
+                sparkle.style.top = (rect.top - modalRect.top + Math.random() * rect.height) + 'px';
+                sparkle.style.animation = `floatSparkle ${Math.random() * 2 + 1}s ease-in-out infinite`;
                 worksModal.appendChild(sparkle);
             }
         }
@@ -640,7 +593,6 @@
             bar.classList.add('bar');
             visualizer.appendChild(bar);
         }
-
         setInterval(() => {
             if (!music.paused && musicCard.classList.contains('show')) {
                 document.querySelectorAll('.bar').forEach(bar => { bar.style.height = Math.random() * 80 + 10 + '%'; });
@@ -662,7 +614,6 @@
             if (window.innerWidth > 900) { 
                 const x = (e.clientX / window.innerWidth - 0.5);
                 const y = (e.clientY / window.innerHeight - 0.5);
-                
                 document.querySelectorAll('.bg-layer').forEach(layer => {
                     layer.style.transform = `translate(${x * -50}px, ${y * -50}px)`;
                 });
