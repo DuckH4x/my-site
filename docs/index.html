@@ -7,20 +7,47 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
+        /* --- ИСПРАВЛЕНИЕ БЕЛОГО ФОНА И СКРОЛЛА --- */
+        html, body {
+            height: 100%;
+            width: 100%;
+            background-color: #0d1117; /* Темный фон вместо белого */
+            overflow-x: hidden;
+        }
+
         body { 
-            min-height: 100vh; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            background-color: #0d1117; 
             color: #fff; 
-            overflow-x: hidden; 
-            overflow-y: auto; 
             perspective: 1000px; 
-            padding: 80px 0 120px 0; 
+            position: relative;
         }
 
-        /* --- Часы --- */
+        /* --- КАСТОМНЫЙ КУРСОР (Только для ПК) --- */
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            pointer-events: none; /* Чтобы не мешал кликам */
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background 0.2s;
+            z-index: 9999;
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+            mix-blend-mode: difference; /* Эффект инверсии цвета */
+            display: none; /* Показываем только на ПК */
+        }
+
+        /* Увеличиваем курсор при наведении на кнопки */
+        a:hover ~ .custom-cursor, button:hover ~ .custom-cursor, .social-btn:hover ~ .custom-cursor {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        /* --- ЧАСЫ --- */
         .clock {
             position: fixed;
             top: 20px;
@@ -99,7 +126,7 @@
             z-index: 10;
             transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             will-change: transform;
-            animation: breathe 6s ease-in-out infinite; /* Эффект дыхания */
+            animation: breathe 6s ease-in-out infinite;
         }
 
         @keyframes breathe {
@@ -208,12 +235,42 @@
 
         .snowflake { position: fixed; top: -10px; background: white; border-radius: 50%; pointer-events: none; opacity: 0.6; z-index: 1; filter: blur(0.5px); }
 
+        /* --- Кнопка Наверх --- */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            display: none; /* Скрыта по умолчанию */
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .scroll-top:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-5px); }
+        .scroll-top.show { display: flex; }
+
         /* =========================================
            МОБИЛЬНАЯ ВЕРСИЯ (Экраны меньше 900px)
            ========================================= */
         @media (max-width: 900px) {
-            body { padding: 100px 0 120px 0; }
+            /* Убираем фиксированную высоту, чтобы контент мог скроллиться */
+            body { 
+                height: auto; 
+                min-height: 100vh;
+                padding: 80px 0 120px 0; 
+                display: block; /* Меняем flex на block для нормального скролла */
+            }
             
+            .custom-cursor { display: none !important; } /* Отключаем курсор на телефоне */
+
             .clock {
                 top: 15px;
                 right: 15px;
@@ -225,6 +282,7 @@
                 flex-direction: column; 
                 height: auto;
                 gap: 20px;
+                margin: 0 auto;
             }
 
             .profile-card {
@@ -232,6 +290,7 @@
                 transform: none !important; 
                 width: 90vw;
                 max-width: 380px;
+                margin: 0 auto;
             }
 
             .music-card {
@@ -240,6 +299,7 @@
                 width: 90vw;
                 max-width: 380px;
                 display: none; 
+                margin: 0 auto;
             }
             .music-card.show { 
                 display: flex; 
@@ -260,10 +320,15 @@
                 gap: 5px;
             }
             .bg-option { padding: 6px 10px; font-size: 11px; }
+
+            .scroll-top { bottom: 80px; right: 20px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- Кастомный курсор -->
+    <div class="custom-cursor" id="cursor"></div>
 
     <!-- Часы -->
     <div class="clock" id="clock">00:00:00</div>
@@ -392,6 +457,11 @@
         <button class="bg-option" onclick="changeBg(3, this)">Фон 3</button>
     </div>
 
+    <!-- Кнопка наверх -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+    </button>
+
     <audio id="bg-music" loop>
         <source src="na-zare.mp3" type="audio/mpeg">
         Ваш браузер не поддерживает аудио.
@@ -414,6 +484,18 @@
         const playlist = document.getElementById('playlist');
         const worksModal = document.getElementById('works-modal');
         const clockEl = document.getElementById('clock');
+        const cursor = document.getElementById('cursor');
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+        // --- КАСТОМНЫЙ КУРСОР ---
+        // Показываем курсор только если устройство поддерживает мышь
+        if (window.matchMedia("(pointer: fine)").matches) {
+            cursor.style.display = 'block';
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+        }
 
         // --- ЧАСЫ ---
         function updateClock() {
@@ -424,7 +506,7 @@
             clockEl.textContent = `${hours}:${minutes}:${seconds}`;
         }
         setInterval(updateClock, 1000);
-        updateClock(); // Запускаем сразу
+        updateClock();
 
         // --- МУЗЫКА ---
         music.volume = volumeSlider.value;
@@ -523,7 +605,6 @@
             setTimeout(() => avatar.classList.remove('spin'), 800);
         });
 
-        // --- СНЕГ (Сделал чуть реалистичнее) ---
         function createSnow() {
             const snowflake = document.createElement('div');
             snowflake.classList.add('snowflake');
@@ -542,6 +623,19 @@
         const style = document.createElement('style');
         style.innerHTML = `@keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }`;
         document.head.appendChild(style);
+
+        // --- КНОПКА НАВЕРХ ---
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollTopBtn.classList.add('show');
+            } else {
+                scrollTopBtn.classList.remove('show');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     </script>
 </body>
 </html>
