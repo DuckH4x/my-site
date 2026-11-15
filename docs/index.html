@@ -2,33 +2,41 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Страница Хацкера</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #0d1117; color: #fff; overflow: hidden; perspective: 1000px; }
+        
+        body { 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            background-color: #0d1117; 
+            color: #fff; 
+            overflow-x: hidden; 
+            overflow-y: auto; /* Разрешаем прокрутку на мобильных */
+            perspective: 1000px; 
+            padding: 20px 0; /* Отступы сверху и снизу */
+        }
 
         /* --- Фоны --- */
-        .bg-layer { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; background-size: cover; background-position: center; z-index: -2; opacity: 0; transition: opacity 1s ease-in-out, transform 0.1s ease-out; will-change: transform; }
+        .bg-layer { 
+            position: fixed; /* Фиксируем фон, чтобы он не уезжал при скролле */
+            top: -5%; left: -5%; width: 110%; height: 110%; 
+            background-size: cover; background-position: center; 
+            z-index: -2; opacity: 0; transition: opacity 1s ease-in-out, transform 0.1s ease-out; 
+            will-change: transform; 
+        }
         #bg-1 { background-image: url('https://images.unsplash.com/photo-1478719059408-592965723cbc?q=80&w=1920&auto=format&fit=crop'); opacity: 1; }
         #bg-2 { background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1920&auto=format&fit=crop'); }
         #bg-3 { background-image: url('https://images.unsplash.com/photo-1483347756197-71ef80e95f73?q=80&w=1920&auto=format&fit=crop'); }
-        .bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.6); z-index: -1; pointer-events: none; }
+        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.6); z-index: -1; pointer-events: none; }
 
-        /* --- Контейнер (Фиксированная ширина) --- */
-        .app-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center; /* Центрируем всё */
-            position: relative;
-            width: 100vw; /* На всю ширину экрана */
-            height: 500px;
-        }
-
-        /* --- Панель с кнопками слева (Магазин/Работы) --- */
+        /* --- Левая панель (Работы) --- */
         .left-sidebar {
-            position: absolute;
-            left: 40px; /* Отступ от края экрана */
+            position: fixed;
+            left: 40px; 
             top: 50%;
             transform: translateY(-50%);
             display: flex;
@@ -42,14 +50,22 @@
             border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 15px;
             padding: 15px 20px; color: #fff; cursor: pointer; font-size: 14px; font-weight: 600;
             display: flex; align-items: center; gap: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        .sidebar-btn:hover {
-            background: rgba(255, 255, 255, 0.15); transform: translateX(5px);
-            border-color: rgba(255,255,255,0.4);
-        }
+        .sidebar-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateX(5px); border-color: rgba(255,255,255,0.4); }
         .sidebar-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+        /* --- Контейнер для карточек --- */
+        .app-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center; 
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* Ограничиваем ширину для больших экранов */
+            height: 500px;
+            padding: 0 20px;
+        }
 
         /* --- Карточка Профиля --- */
         .profile-card {
@@ -59,18 +75,11 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             position: absolute;
             z-index: 10;
-            /* Центрируем профиль по умолчанию */
-            left: 50%;
-            transform: translateX(-50%);
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), left 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            will-change: transform, left;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            will-change: transform;
         }
 
-        /* Когда открыта музыка, профиль уезжает влево */
-        .app-wrapper.music-open .profile-card {
-            left: 50%; /* Остается в центре контейнера */
-            transform: translateX(calc(-50% - 200px)); /* Но сдвигается левее на 200px */
-        }
+        .app-wrapper.music-open .profile-card { transform: translateX(-200px); }
 
         .avatar { width: 90px; height: 90px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.3); margin-bottom: 15px; object-fit: cover; transition: transform 0.5s ease, border-color 0.3s ease; cursor: pointer; }
         .avatar:hover { transform: scale(1.1) rotate(5deg); border-color: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
@@ -93,30 +102,20 @@
         .btn:hover { background: rgba(255, 255, 255, 0.2); box-shadow: 0 0 15px rgba(255,255,255,0.1); }
         .btn.active-music { background: #fff; color: #000; border-color: #fff; font-weight: bold; }
 
-        /* --- Карточка Музыки (Плеер) --- */
+        /* --- Карточка Музыки --- */
         .music-card {
             background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 30px; width: 380px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); z-index: 9;
-            
             position: absolute;
-            /* Центрируем карточку по умолчанию */
-            left: 50%;
-            transform: translateX(-50%) translateX(50px); /* Сдвигаем вправо для анимации */
             opacity: 0;
+            transform: translateX(100px);
             pointer-events: none;
-            
             transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease;
             will-change: transform, opacity;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
         }
-        
-        .music-card.show { 
-            opacity: 1; 
-            transform: translateX(-50%) translateX(200px); /* Выезжает вправо */
-            pointer-events: auto;
-        }
+        .music-card.show { opacity: 1; transform: translateX(200px); pointer-events: auto; }
 
         .music-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
         .album-cover { width: 70px; height: 70px; border-radius: 10px; background: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=200&auto=format&fit=crop') center/cover; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex-shrink: 0; }
@@ -155,60 +154,83 @@
         .playlist-item:hover { background: rgba(255,255,255,0.15); }
         .playlist-item.active { background: rgba(255,255,255,0.25); font-weight: bold; }
 
-        /* --- Модальное окно "Мои работы" --- */
+        /* --- Модальное окно работ --- */
         .works-modal {
-            position: absolute;
-            top: 50%; left: 50%;
+            position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%) scale(0.9);
             background: rgba(20, 25, 35, 0.95); backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.2); border-radius: 20px;
-            padding: 30px; width: 400px;
+            padding: 30px; width: 400px; max-width: 90vw;
             box-shadow: 0 20px 50px rgba(0,0,0,0.7); z-index: 100;
             display: none; flex-direction: column; gap: 15px;
             opacity: 0; transition: all 0.4s ease;
         }
         .works-modal.show { display: flex; opacity: 1; transform: translate(-50%, -50%) scale(1); }
         .works-modal h2 { text-align: center; margin-bottom: 10px; }
-        .work-item {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            padding: 15px; border-radius: 12px; text-decoration: none; color: #fff;
-            transition: all 0.3s ease; display: flex; justify-content: space-between; align-items: center;
-        }
+        .work-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; text-decoration: none; color: #fff; transition: all 0.3s ease; display: flex; justify-content: space-between; align-items: center; }
         .work-item:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
         .close-modal { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #fff; cursor: pointer; font-size: 20px; opacity: 0.7; }
         .close-modal:hover { opacity: 1; }
 
         /* --- Панель фонов --- */
-        .bg-selector { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 10px; display: flex; gap: 10px; z-index: 20; }
+        .bg-selector { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 10px; display: flex; gap: 10px; z-index: 20; }
         .bg-option { background: transparent; border: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: all 0.3s ease; }
         .bg-option:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
         .bg-option.active { background: #fff; color: #000; font-weight: bold; border-color: #fff; }
 
-        .snowflake { position: absolute; top: -10px; background: white; border-radius: 50%; pointer-events: none; opacity: 0.8; z-index: 1; }
+        .snowflake { position: fixed; top: -10px; background: white; border-radius: 50%; pointer-events: none; opacity: 0.8; z-index: 1; }
 
-        /* --- Адаптив --- */
-        @media (max-width: 1000px) {
-            .left-sidebar { left: 10px; }
-            .sidebar-btn span { display: none; } /* Скрываем текст на узких экранах */
-            .sidebar-btn { padding: 15px; border-radius: 50%; }
-        }
-
-        @media (max-width: 850px) {
-            .app-wrapper { flex-direction: column; gap: 20px; height: auto; }
-            .profile-card { position: relative; left: auto; transform: none !important; width: 90vw; max-width: 380px; }
-            .music-card { position: relative; left: auto; width: 90vw; max-width: 380px; transform: translateY(20px) !important; display: none; }
-            .music-card.show { display: flex; transform: translateY(0) !important; }
-            
-            .left-sidebar { 
-                position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); 
-                flex-direction: row; top: auto;
+        /* =========================================
+           МОБИЛЬНАЯ ВЕРСИЯ (Экраны меньше 900px)
+           ========================================= */
+        @media (max-width: 900px) {
+            .app-wrapper {
+                flex-direction: column; /* Ставим карточки друг под другом */
+                height: auto;
+                gap: 20px;
+                padding-top: 60px; /* Отступ сверху для кнопки работ */
             }
-            .sidebar-btn span { display: block; } /* Возвращаем текст на мобильных */
-            .sidebar-btn { border-radius: 15px; }
-            
-            .bg-selector { flex-direction: column; gap: 5px; bottom: 10px; }
-            .bg-option { padding: 6px 10px; font-size: 11px; }
-            .works-modal { width: 90vw; max-width: 380px; }
+
+            .profile-card {
+                position: relative;
+                transform: none !important; /* Отключаем сдвиг влево */
+                width: 100%;
+                max-width: 380px;
+            }
+
+            .music-card {
+                position: relative;
+                transform: translateY(-20px); /* Плеер выезжает снизу */
+                width: 100%;
+                max-width: 380px;
+                display: none; /* Скрыт по умолчанию */
+            }
+            .music-card.show { 
+                display: flex; 
+                transform: translateY(0); 
+            }
+
+            /* Кнопка "Работы" переезжает наверх по центру */
+            .left-sidebar {
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                flex-direction: row;
+            }
+            .sidebar-btn {
+                padding: 10px 20px;
+            }
+
+            /* Панель фонов становится горизонтальной и прилипает к низу */
+            .bg-selector {
+                bottom: 10px;
+                padding: 8px;
+                gap: 5px;
+            }
+            .bg-option {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
         }
     </style>
 </head>
@@ -363,7 +385,6 @@
         music.volume = volumeSlider.value;
         volumeSlider.addEventListener('input', (e) => { music.volume = e.target.value; });
 
-        // Открытие/Закрытие плеера
         function togglePlayer() {
             musicCard.classList.toggle('show');
             appWrapper.classList.toggle('music-open');
@@ -378,7 +399,6 @@
             }
         }
 
-        // Управление музыкой
         function toggleMusic() {
             if (music.paused) {
                 music.play();
@@ -399,12 +419,10 @@
             playlist.classList.remove('show');
         }
 
-        // Открытие окна работ
         function toggleWorks() {
             worksModal.classList.toggle('show');
         }
 
-        // Прогресс-бар
         music.addEventListener('timeupdate', () => {
             const current = music.currentTime;
             const duration = music.duration || 0;
@@ -426,7 +444,6 @@
             return `${min}:${sec < 10 ? '0' : ''}${sec}`;
         }
 
-        // Визуализатор
         for (let i = 0; i < 30; i++) {
             const bar = document.createElement('div');
             bar.classList.add('bar');
@@ -441,7 +458,6 @@
             }
         }, 150);
 
-        // Смена фона
         function changeBg(index, btnElement) {
             document.querySelectorAll('.bg-layer').forEach(layer => layer.style.opacity = '0');
             document.getElementById(`bg-${index}`).style.opacity = '1';
@@ -449,7 +465,6 @@
             btnElement.classList.add('active');
         }
 
-        // Параллакс
         document.addEventListener('mousemove', (e) => {
             const x = (e.clientX / window.innerWidth - 0.5);
             const y = (e.clientY / window.innerHeight - 0.5);
@@ -458,13 +473,11 @@
             });
         });
 
-        // Клик по аватарке
         avatar.addEventListener('click', () => {
             avatar.classList.add('spin');
             setTimeout(() => avatar.classList.remove('spin'), 800);
         });
 
-        // Снег
         function createSnow() {
             const snowflake = document.createElement('div');
             snowflake.classList.add('snowflake');
