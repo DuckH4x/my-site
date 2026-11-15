@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Страница Хацкера</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -14,16 +14,17 @@
             align-items: center; 
             background-color: #0d1117; 
             color: #fff; 
+            /* Убрали overflow: hidden, чтобы на телефоне можно было скроллить */
             overflow-x: hidden; 
-            overflow-y: auto; /* Разрешаем прокрутку на мобильных */
+            overflow-y: auto; 
             perspective: 1000px; 
-            padding: 20px 0; /* Отступы сверху и снизу */
+            padding: 80px 0 120px 0; /* Отступы сверху и снизу для панелек */
         }
 
         /* --- Фоны --- */
         .bg-layer { 
-            position: fixed; /* Фиксируем фон, чтобы он не уезжал при скролле */
-            top: -5%; left: -5%; width: 110%; height: 110%; 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
             background-size: cover; background-position: center; 
             z-index: -2; opacity: 0; transition: opacity 1s ease-in-out, transform 0.1s ease-out; 
             will-change: transform; 
@@ -33,7 +34,7 @@
         #bg-3 { background-image: url('https://images.unsplash.com/photo-1483347756197-71ef80e95f73?q=80&w=1920&auto=format&fit=crop'); }
         .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.6); z-index: -1; pointer-events: none; }
 
-        /* --- Левая панель (Работы) --- */
+        /* --- Левая панель (Работы) для ПК --- */
         .left-sidebar {
             position: fixed;
             left: 40px; 
@@ -62,9 +63,8 @@
             justify-content: center; 
             position: relative;
             width: 100%;
-            max-width: 800px; /* Ограничиваем ширину для больших экранов */
+            max-width: 800px;
             height: 500px;
-            padding: 0 20px;
         }
 
         /* --- Карточка Профиля --- */
@@ -184,33 +184,36 @@
            МОБИЛЬНАЯ ВЕРСИЯ (Экраны меньше 900px)
            ========================================= */
         @media (max-width: 900px) {
+            body {
+                padding: 80px 0 120px 0; /* Место для кнопок сверху и снизу */
+            }
+
             .app-wrapper {
-                flex-direction: column; /* Ставим карточки друг под другом */
+                flex-direction: column; /* Карточки друг под другом */
                 height: auto;
                 gap: 20px;
-                padding-top: 60px; /* Отступ сверху для кнопки работ */
             }
 
             .profile-card {
                 position: relative;
-                transform: none !important; /* Отключаем сдвиг влево */
-                width: 100%;
+                transform: none !important; 
+                width: 90vw;
                 max-width: 380px;
             }
 
             .music-card {
                 position: relative;
-                transform: translateY(-20px); /* Плеер выезжает снизу */
-                width: 100%;
+                transform: translateY(-20px); 
+                width: 90vw;
                 max-width: 380px;
-                display: none; /* Скрыт по умолчанию */
+                display: none; 
             }
             .music-card.show { 
                 display: flex; 
                 transform: translateY(0); 
             }
 
-            /* Кнопка "Работы" переезжает наверх по центру */
+            /* Кнопка "Работы" переезжает наверх */
             .left-sidebar {
                 top: 20px;
                 left: 50%;
@@ -221,7 +224,7 @@
                 padding: 10px 20px;
             }
 
-            /* Панель фонов становится горизонтальной и прилипает к низу */
+            /* Панель фонов прилипает к низу */
             .bg-selector {
                 bottom: 10px;
                 padding: 8px;
